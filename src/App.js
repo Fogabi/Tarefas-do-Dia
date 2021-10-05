@@ -31,7 +31,7 @@ const Tarefa = styled.li`
 
 export default class App extends React.Component {
   state = {
-    tarefa: [{id: Date.now(), texto: 'comer batata', completa: false}],
+    tarefa: [],
     filtro: "",
     inputValue: "",
   };
@@ -42,6 +42,9 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
+    const salvarTarefas = JSON.stringify(this.state.tarefa);
+    localStorage.setItem("tarefasSalvas", salvarTarefas);
+
     const recuperarTarefas = localStorage.getItem("tarefasSalvas");
     const tarefasSalvas = JSON.parse(recuperarTarefas);
 
