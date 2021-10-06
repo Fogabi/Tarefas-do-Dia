@@ -5,15 +5,16 @@ import "./App.css";
 const ContainerTarefa = styled.div`
   display: flex;
   justify-content: space-between;
-`
+`;
 const BotaoApagar = styled.button`
   height: 20px;
-`
+`;
 
 const InputsContainer = styled.div`
   display: grid;
   grid-auto-flow: column;
   gap: 10px;
+  margin-bottom: 5px;
 `;
 
 const TarefaList = styled.ul`
@@ -34,23 +35,24 @@ export default class App extends React.Component {
     tarefa: [],
     filtro: "",
     inputValue: "",
+    filtroNome: "",
+    sort: "Crescente"
   };
 
   componentDidUpdate() {
-    const salvarTarefas = JSON.stringify(this.state.tarefa);
-    localStorage.setItem("tarefasSalvas", salvarTarefas);
+    const salvarTarefas = this.state.tarefa;
+    localStorage.setItem("listaTarefas", JSON.stringify(salvarTarefas));
   }
 
   componentDidMount() {
-    const salvarTarefas = JSON.stringify(this.state.tarefa);
-    localStorage.setItem("tarefasSalvas", salvarTarefas);
+    if (localStorage.getItem("listaTarefas")) {
+      const tarefasLS = localStorage.getItem("listaTarefas");
+      const tarefasObjetos = JSON.parse(tarefasLS);
 
-    const recuperarTarefas = localStorage.getItem("tarefasSalvas");
-    const tarefasSalvas = JSON.parse(recuperarTarefas);
-
-    this.setState({
-      tarefa: tarefasSalvas,
-    });
+      this.setState({
+        tarefa: tarefasObjetos,
+      });
+    }
   }
 
   OnChangeInput = (event) => {
@@ -90,27 +92,41 @@ export default class App extends React.Component {
     this.setState({ filtro: event.target.value });
   };
 
-  apagarTarefa = (id) => {
-    const filtraLista = this.state.tarefa.filter((tarefa) => {
-    return id !== tarefa.id
-    })
-    this.setState({
-      tarefa: filtraLista
-    })
+  OnChangeFiltroNome = (event) => {
+    this.setState({ filtroNome: event.target.value });
+  };
+
+  onChangeSort = (event) => {
+    this.setState({sort: event.target.value})
   }
 
-  render() {
-
-    const listaFiltrada = this.state.tarefa.filter((tarefa) => {
+  Filtros = () => {
+    return this.state.tarefa
+    .filter((tarefas) => this.state.filtroNome? tarefas.texto.includes(this.state.filtroNome): true)
+    .filter((tarefas) => {
       switch (this.state.filtro) {
         case "Pendentes":
-          return !tarefa.completa;
+          return !tarefas.completa;
         case "Completas":
-          return tarefa.completa;
+          return tarefas.completa;
         default:
           return true;
       }
+    })
+  }
+
+  apagarTarefa = (id) => {
+    const filtraLista = this.state.tarefa.filter((tarefa) => {
+      return id !== tarefa.id;
     });
+    this.setState({
+      tarefa: filtraLista,
+    });
+  };
+
+  render() {
+    const retornaFiltros = this.Filtros()
+
     return (
       <div className="App">
         <h1>Tarefas do dia</h1>
@@ -124,15 +140,22 @@ export default class App extends React.Component {
         </InputsContainer>
         <br />
         <InputsContainer>
-          <label>Filtro</label>
+          <label>Filtrar por status</label>
           <select value={this.state.filtro} onChange={this.OnChangeFilter}>
             <option>Nenhum</option>
             <option>Pendentes</option>
             <option>Completas</option>
           </select>
         </InputsContainer>
+        <InputsContainer>
+          <label>Filtrar por nome</label>
+          <input
+            value={this.state.filtroNome}
+            onChange={this.OnChangeFiltroNome}
+          />
+        </InputsContainer>
         <TarefaList>
-          {listaFiltrada.map((tarefa) => {
+          {retornaFiltros.map((tarefa) => {
             return (
               <ContainerTarefa>
                 <Tarefa
@@ -141,7 +164,9 @@ export default class App extends React.Component {
                 >
                   {tarefa.texto}
                 </Tarefa>
-                <BotaoApagar onClick={() => this.apagarTarefa(tarefa.id)}>X</BotaoApagar>
+                <BotaoApagar onClick={() => this.apagarTarefa(tarefa.id)}>
+                  X
+                </BotaoApagar>
               </ContainerTarefa>
             );
           })}
