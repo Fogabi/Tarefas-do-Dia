@@ -119,6 +119,14 @@ export default class App extends React.Component {
     });
   };
 
+  apagarLista = () => {
+    let arrayTarefas = [...this.state.tarefa]
+    for (let i = arrayTarefas.length; i > 0; i--){
+      arrayTarefas.pop()
+    }
+    this.setState({tarefa: arrayTarefas})
+  }
+
   render() {
     const retornaFiltros = this.Filtros()
 
@@ -166,6 +174,7 @@ export default class App extends React.Component {
             );
           })}
         </TarefaList>
+        <button onClick={this.apagarLista}>Limpar tarefas</button>
       </div>
     );
   }
