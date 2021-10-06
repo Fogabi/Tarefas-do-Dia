@@ -36,7 +36,6 @@ export default class App extends React.Component {
     filtro: "",
     inputValue: "",
     filtroNome: "",
-    sort: "Crescente"
   };
 
   componentDidUpdate() {
@@ -95,10 +94,6 @@ export default class App extends React.Component {
   OnChangeFiltroNome = (event) => {
     this.setState({ filtroNome: event.target.value });
   };
-
-  onChangeSort = (event) => {
-    this.setState({sort: event.target.value})
-  }
 
   Filtros = () => {
     return this.state.tarefa
